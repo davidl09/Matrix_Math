@@ -5,5 +5,4 @@ set(CMAKE_C_STANDARD 11)
 
 include_directories(.)
 
-add_executable(Matrix_Math
-        main.c matrix.c matrix.h)
+add_executable(Matrix_Math main.c matrix.c matrix.h)
