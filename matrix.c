@@ -254,17 +254,13 @@ Matrix* mat_alloc_r(Matrix* matrix){
 
 Matrix* mat_copy(Matrix* mat){
     //duplicates given matrix and returns pointer to copy
-    Matrix* mat2 = malloc(sizeof(Matrix)); //allocate on heap
-    mat_alloc(mat->rows, mat->columns);
+    Matrix* mat2 = mat_alloc(mat->rows, mat->columns);
 
-    mat2->columns = mat->columns;
-    mat2->rows = mat->rows;
     for (int i = 0; i < mat->rows; ++i) {
         for (int j = 0; j < mat->columns; ++j) {
             mat2->self[i][j] = mat->self[i][j];
         }
     }
-
     return mat2;
 }
 
@@ -349,7 +345,7 @@ Matrix* input_mat(){
 
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < columns; ++j) {
-            printf("Row %d, column %d\n", i, j);
+            printf("Row %d, column %d\n", i + 1, j + 1);
             input_rational(&(mat->self[i][j]));
         }
     }
@@ -360,9 +356,9 @@ Matrix* input_mat(){
 
 void print_mat(Matrix* mat){
     for (int i = 0; i < mat->rows; ++i) {
-        printf("[ ");
+        printf("[");
         for (int j = 0; j < mat->columns; ++j) {
-            printf("  %d/%d  ", mat->self[i][j].numerator, mat->self[i][j].denominator);
+            printf(" %3.d/%d ", mat->self[i][j].numerator, mat->self[i][j].denominator);
         }
         printf(" ]\n\n");
     }
