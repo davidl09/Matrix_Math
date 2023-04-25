@@ -17,75 +17,55 @@ unsigned int is_prime(int num){
 
 
 Rational* input_rational(Rational* num){
-
-    char input[40];
-    char* ptr[20];
-    short len;
-
-    for (int i = 0; i < 20; ++i) {
-        ptr[i] = malloc(40 * sizeof(char));
-    }
+    double numer, denom;
+    char* input[3];
+    int dec_pts = 0;
+    input[0] = malloc(40);
 
     printf("Enter a fraction, decimal number, or combination thereof\n");
-    len = (short)scanf("%s", input);
+    scanf("%s", input[0]);
 
-    for (int i = 0; i < 40; ++i) {
-        if(input[i] == '\n' || input[i] == '\0') {
-            input[i] = '\0';
-            break;
-        }
-        if(input[i] != '/' && input[i] != '.' && input[i] != '\0' && input[i] != '-' && (input[i] < '0' || input[i] > '9')){
-            printf("That was not a valid input, please try again\n");
+    switch(sscanf(input[0], "%lf/%lf", &numer, &denom)){ //check for invalid input
+        case 0:
+            printf("Not a valid input, please try again\n");
+            free(input[0]);
             return input_rational(num);
-        }
+        case 1: 
+            denom = 1; 
+            strtok(input[0], ".");
+            dec_pts = ((input[1] = strtok(NULL, ".")) != NULL ? strlen(input[1]) : 0);
+            break;
+        case 2:
+            if(denom == 0.0){
+                printf("Divide by zero, please try again\n");
+                free(input[0]);
+                return input_rational(num);
+            }
+
+            input[0] = strtok(input[0], "/"); //ptr to numerator
+            input[1] = strtok(NULL, "/"); //ptr to denominator - ptr[3] is temp buffer
+            
+            strtok(input[0], ".");
+            input[2] = strtok(NULL, ".");
+            dec_pts = (input[2] != NULL ? strlen(input[2]) : 0); //num of decimal places on numerator
+
+            strtok(input[1], ".");
+            input[2] = strtok(NULL, ".");
+            dec_pts = (dec_pts >= (input[2] != NULL ? strlen(input[2]) : 0) ? dec_pts : strlen(input[2]));
+            break;
+
+        default: 
+            printf("Not a valid input, please try again\n");
+            free(input[0]);
+            return input_rational(num);
     }
 
-    unsigned int i = 0;
-    unsigned int dec_pts = 0;
-    unsigned int gfact;
-    double numer, denom;
+    num->numerator = (int)round(numer * pow(10, dec_pts));
+    num->denominator = (int)round(denom * pow(10, dec_pts));
 
-    ptr[0] = strtok(input, "/");
-    ptr[1] = strtok(NULL, "/");
+    rnorm(num);
 
-    if(!ptr[0]){ //if no number included before the '/' sign
-        printf("That was not a valid input, please try again\n");
-        return input_rational(num);
-    }
-
-    //evaluate numerator
-    numer = atof(ptr[0]);
-    strtok(ptr[0], ".");
-    ptr[2] = strtok(NULL, ".");
-    if(ptr[2])
-        dec_pts = strlen(ptr[2]);
-    else dec_pts = strlen(ptr[0]);
-
-    //evaluate denominator
-    if(ptr[1]) { //if a '/' detected
-        denom = atof(ptr[1]);
-        strtok(ptr[1], ".");
-        ptr[3] = strtok(NULL, ".");
-        if (ptr[3])
-            i = strlen(ptr[3]);
-        else i = 1;
-
-        dec_pts = min(7, max(dec_pts, i));
-    }
-    else{
-        denom = 1;
-    }
-
-    num->numerator = (int)round(numer *  pow(10, dec_pts));
-    num->denominator = (int)round(denom *  pow(10, dec_pts));
-
-    gfact = gcf(num->numerator, num->denominator);
-
-
-    num->numerator /= (int)gfact;
-    num->denominator /= (int)gfact;
-    num->dec_est = (double)num->numerator/num->denominator;
-
+    free(input[0]);
     return num;
 }
 
@@ -113,8 +93,9 @@ Rational* rnorm(Rational* rational){
     return rational;
 }
 
-Rational* set_rat_f(Rational* rational, double val){
-    //set a rational's fractional part from a given float (7 digit precision)
+Rational* set_rat_f(Rational* rational, double val)
+//set a rational's fractional part from a given float (7 digit precision)
+{
     if(fabs(val - round(val)) < 1e-7){
         rational->dec_est = round(val);
         rational->numerator = (int)round(val);
@@ -136,7 +117,7 @@ Rational* set_rat_f(Rational* rational, double val){
 }
 
 Rational* rat_sum(Rational* num1, Rational* num2){
-    //adds two rational objects and stores result in second object
+    //adds two rational objects and stores result in first object
     int temp = num1->denominator;
     num1->numerator *= num2->denominator;
     num1->denominator *= num2->denominator;
@@ -291,9 +272,10 @@ Matrix* mat_dif(Matrix* mat1, Matrix* mat2){
 }
 
 Matrix* mat_prod(Matrix* mat1, Matrix* mat2){
-    if(mat1->columns != mat2->rows)
+    if(mat1->columns != mat2->rows){
+        fprintf(stderr, "Columns in mat1 must match rows in mat2");
         return NULL;
-
+    }
     Rational temp;
     Matrix* result = mat_alloc(mat1->rows, mat2->columns);
     for (int i = 0; i < result->rows; ++i) {
@@ -370,7 +352,7 @@ void print_mat(Matrix* mat){
     for (int i = 0; i < mat->rows; ++i) {
         printf("[");
         for (int j = 0; j < mat->columns; ++j) {
-            printf(" %3.d/%d ", mat->self[i][j].numerator, mat->self[i][j].denominator);
+            printf(" %3.lld/%lld ", mat->self[i][j].numerator, mat->self[i][j].denominator);
         }
         printf(" ]\n\n");
     }
@@ -378,26 +360,34 @@ void print_mat(Matrix* mat){
 }
 
 unsigned int gcf(int num1, int num2){
-    int numFact[2], gcf = 1;
-    int** factors = calloc(2, sizeof(int*));
-    int* temp;
 
-    factors[0] = calloc((round_e2(num1) + 1), sizeof(int));
-    factors[1] = calloc((round_e2(num2) + 1), sizeof(int));
+    if(max(num1, num2)%min(num1, num2) == 0) //simple checks to save time in some cases
+        return min(num1, num2);
+    if(max(num1, num2) < 10000){
+        if((is_prime(num1) || is_prime(num2)))
+            return 1;
+    }
+
+    int numFact[2], gcf = 1;
+    long long int** factors = calloc(2, sizeof(long long int*));
+    long long int* temp;
+
+    factors[0] = calloc((round_e2(num1) + 1), sizeof(long long int));
+    factors[1] = calloc((round_e2(num2) + 1), sizeof(long long int));
 
     if(factors[0] == NULL || factors[1] == NULL){
         fprintf(stderr, "Error allocating memory\n");
         return 0;
     }
 
-    factors[0][0] = num1;
-    factors[1][0] = num2;
+    factors[0][0] = abs(num1);
+    factors[1][0] = abs(num2);
 
     for(int i = 0; i<2; i++){
         numFact[i] = 1;
         for (int j = 1; j < factors[i][0]; j++) {
             if (factors[i][0] % (j+1) == 0) {
-                temp = realloc(factors[i], (numFact[i] + 1) * sizeof(int));
+                temp = realloc(factors[i], (numFact[i] + 1) * sizeof(long long int));
                 if(!temp){
                     fprintf(stderr, "Error allocating memory\n");
                     return 0;
@@ -407,6 +397,7 @@ unsigned int gcf(int num1, int num2){
                 numFact[i]++;
             }
         }
+
     }
 
     for (int i = 0; i < numFact[0]; ++i) {
@@ -415,9 +406,10 @@ unsigned int gcf(int num1, int num2){
                 gcf = factors[0][i];
         }
     }
-
+    
+    free(factors[0]);
+    free(factors[1]);
     free(factors);
-
     return gcf;
 }
 

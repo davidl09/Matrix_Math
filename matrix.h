@@ -18,8 +18,8 @@
 #define max(num1, num2) (num1 > num2 ? num1 : num2)
 
 typedef struct Rational{
-    int numerator;
-    int denominator;
+    long long int numerator;
+    long long int denominator;
     double dec_est; //slave to numerator/denominator
 }Rational;
 
