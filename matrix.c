@@ -59,13 +59,13 @@ Rational* input_rational(Rational* num){
     else dec_pts = strlen(ptr[0]);
 
     //evaluate denominator
-    if(ptr[1]) {
+    if(ptr[1]) { //if a '/' detected
         denom = atof(ptr[1]);
         strtok(ptr[1], ".");
         ptr[3] = strtok(NULL, ".");
         if (ptr[3])
             i = strlen(ptr[3]);
-        else i = strlen(ptr[1]);
+        else i = 1;
 
         dec_pts = min(7, max(dec_pts, i));
     }
@@ -73,8 +73,8 @@ Rational* input_rational(Rational* num){
         denom = 1;
     }
 
-    num->numerator = (int)(numer *  pow(10, dec_pts));
-    num->denominator = (int)(denom *  pow(10, dec_pts));
+    num->numerator = (int)round(numer *  pow(10, dec_pts));
+    num->denominator = (int)round(denom *  pow(10, dec_pts));
 
     gfact = gcf(num->numerator, num->denominator);
 
@@ -223,7 +223,7 @@ Matrix* multiply_mat(Matrix* mat1, Matrix* mat2){
 }
 
 unsigned int gcf(int num1, int num2){
-    int numFact[2], gcf;
+    int numFact[2], gcf = 1;
     int** factors = calloc(2, sizeof(int*));
     int* temp;
 

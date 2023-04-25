@@ -1,0 +1,12 @@
+[
+{
+  "directory": "C:/Users/dalae/Desktop/C/Matrix_Math/build",
+  "command": "C:\\MinGW\\bin\\gcc.exe  @CMakeFiles/Matrix_Math.dir/includes_C.rsp -g -o CMakeFiles\\Matrix_Math.dir\\main.c.obj -c C:\\Users\\dalae\\Desktop\\C\\Matrix_Math\\main.c",
+  "file": "C:/Users/dalae/Desktop/C/Matrix_Math/main.c"
+},
+{
+  "directory": "C:/Users/dalae/Desktop/C/Matrix_Math/build",
+  "command": "C:\\MinGW\\bin\\gcc.exe  @CMakeFiles/Matrix_Math.dir/includes_C.rsp -g -o CMakeFiles\\Matrix_Math.dir\\matrix.c.obj -c C:\\Users\\dalae\\Desktop\\C\\Matrix_Math\\matrix.c",
+  "file": "C:/Users/dalae/Desktop/C/Matrix_Math/matrix.c"
+}
+]

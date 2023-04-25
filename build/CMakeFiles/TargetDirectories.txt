@@ -1,0 +1,3 @@
+C:/Users/dalae/Desktop/C/Matrix_Math/build/CMakeFiles/Matrix_Math.dir
+C:/Users/dalae/Desktop/C/Matrix_Math/build/CMakeFiles/edit_cache.dir
+C:/Users/dalae/Desktop/C/Matrix_Math/build/CMakeFiles/rebuild_cache.dir
