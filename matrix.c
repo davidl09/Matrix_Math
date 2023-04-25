@@ -309,6 +309,18 @@ Matrix* mat_prod(Matrix* mat1, Matrix* mat2){
     return result;
 }
 
+Matrix* mat_row_swap(Rational* row1, Rational* row2){
+
+}
+
+Matrix* mat_row_sm(Rational* row){
+
+}
+
+Matrix* mat_row_add(Rational* row1, Rational* row2, Rational coeff){
+    
+}
+
 Matrix* input_mat(){
     //allocates mem and polls user to fill matrix
 

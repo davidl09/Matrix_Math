@@ -57,5 +57,8 @@ Matrix* mat_copy(Matrix* mat);
 Matrix* mat_sum(Matrix* mat, Matrix* mat2);
 Matrix* mat_dif(Matrix* mat1, Matrix* mat2);
 Matrix* mat_prod(Matrix* mat1, Matrix* mat2);
+Matrix* mat_row_swap(Rational* row1, Rational* row2);
+Matrix* mat_row_sm(Rational* row);
+Matrix* mat_row_add(Rational* row1, Rational* row2, Rational coeff);
 
 #endif //MATRIX_MATH_MATRIX_H
