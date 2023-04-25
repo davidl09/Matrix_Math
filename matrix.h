@@ -36,8 +36,9 @@ Rational* rat_sum(Rational* num1, Rational* num2);
 Rational* rat_dif(Rational* num1, Rational* num2);
 Rational* rat_s_prod(Rational* num, double scalar);
 Rational* rat_r_prod(Rational* num1, Rational* num2);
+Rational rat_r_prod_c(Rational num1, Rational num2);
 Rational* rat_r_quot(Rational* num1, Rational* num2);
-Rational* check_norm(Rational* num);
+Rational* rat_inv_s(Rational* num1);
 Rational* input_rational(Rational* num);
 Rational* rnorm(Rational* rational);
 
@@ -47,6 +48,14 @@ unsigned int prime_fact(int num);
 unsigned int* list_prime_fact(int num);
 unsigned int round_e2(double num);
 
-void* alloc_mat(int rows, int columns);
+void mat_free(Matrix* mat);
+void print_mat(Matrix* mat);
+Matrix* input_mat();
+Matrix* mat_alloc(int rows, int columns);
+Matrix* mat_alloc_r(Matrix* matrix);
+Matrix* mat_copy(Matrix* mat);
+Matrix* mat_sum(Matrix* mat, Matrix* mat2);
+Matrix* mat_dif(Matrix* mat1, Matrix* mat2);
+Matrix* mat_prod(Matrix* mat1, Matrix* mat2);
 
 #endif //MATRIX_MATH_MATRIX_H

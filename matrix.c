@@ -3,6 +3,7 @@
 //
 
 #include "matrix.h"
+#include <stdio.h>
 
 unsigned int is_prime(int num){
     num = abs(num);
@@ -13,17 +14,19 @@ unsigned int is_prime(int num){
     return 1;
 }
 
-Rational* parse_frac(Rational* rational, char frac[7]){
-    char* numer = strtok(frac, "/");
-}
+
 
 Rational* input_rational(Rational* num){
+
     char input[40];
     char* ptr[20];
     short len;
+
     for (int i = 0; i < 20; ++i) {
         ptr[i] = malloc(40 * sizeof(char));
     }
+
+    printf("Enter a fraction, decimal number, or combination thereof\n");
     len = (short)scanf("%s", input);
 
     for (int i = 0; i < 40; ++i) {
@@ -95,6 +98,7 @@ Rational* set_rat_d(Rational* rational){
 }
 
 Rational* rnorm(Rational* rational){
+    //call after manipulating rational expressions, ensures conformity with sign convention and reduces fraction if necessary
     if(rational->denominator < 0){ //make denominator always positive
         rational->denominator *= -1;
         rational->numerator *= -1;
@@ -113,7 +117,7 @@ Rational* set_rat_f(Rational* rational, double val){
     //set a rational's fractional part from a given float (7 digit precision)
     if(fabs(val - round(val)) < 1e-7){
         rational->dec_est = round(val);
-        rational->numerator = (int)val;
+        rational->numerator = (int)round(val);
         rational->denominator = 1;
         return rational;
     }
@@ -152,7 +156,7 @@ Rational* rat_sum(Rational* num1, Rational* num2){
 }
 
 Rational* rat_dif(Rational* num1, Rational* num2){
-//subtracts second rational from first and stores result in second object
+//subtracts second rational from first and stores result in first object
     int temp = num1->denominator;
     num1->numerator *= num2->denominator; //cross multiply
     num1->denominator *= num2->denominator;
@@ -171,6 +175,12 @@ Rational* rat_dif(Rational* num1, Rational* num2){
     return NULL;
 }
 
+Rational* rat_inv_s(Rational* num1){
+    num1->numerator *= -1;
+    rnorm(num1);
+    return num1;
+}
+
 Rational* rat_s_prod(Rational* num, double scalar){
     if(set_rat_d(num)){
         set_rat_f(num, num->dec_est * scalar);
@@ -186,6 +196,13 @@ Rational* rat_r_prod(Rational* num1, Rational* num2){
     return num1;
 }
 
+Rational rat_r_prod_c(Rational num1, Rational num2){
+    num1.numerator *= num2.numerator;
+    num1.denominator *= num2.denominator;
+    rnorm(&num1);
+    return num1;
+}
+
 Rational* rat_r_quot(Rational* num1, Rational* num2){
     if(num2->numerator == 0)
         return NULL;
@@ -195,31 +212,161 @@ Rational* rat_r_quot(Rational* num1, Rational* num2){
     return num1;
 }
 
-void* alloc_mat(int rows, int columns){
-    Matrix* matrix = malloc(sizeof(Matrix));
-    matrix->self = malloc(rows * sizeof(Rational*));
+void mat_free(Matrix* mat){
+    //deallocate all memory allocated to a matrix
+    for (int i = 0; i < mat->columns; ++i) {
+        free(mat->self[i]);
+    }
+    free(mat->self);
+    free(mat);
+}
+
+Matrix* mat_alloc(int rows, int columns){
+    Matrix* matrix = malloc(sizeof(Matrix)); //allocate object on heap
+
+    matrix->columns = columns;
+    matrix->rows = rows;
+
+    matrix->self = malloc(matrix->rows * sizeof(Rational*));
     for (int i = 0; i < rows; ++i) {
-        matrix->self[i] = malloc(columns * sizeof(Rational));
-        for (int j = 0; j < columns; ++j) {
+        matrix->self[i] = malloc(matrix->columns * sizeof(Rational));
+        for (int j = 0; j < matrix->columns; ++j) {
             set_rat_f(&matrix->self[i][j], 0.0);
-            set_rat_d(&matrix->self[i][j]);
+        }
+    }
+
+    return matrix;
+}
+
+Matrix* mat_alloc_r(Matrix* matrix){
+//allocate memory to existing matrix
+
+    matrix->self = malloc(matrix->rows * sizeof(Rational*));
+
+    for (int i = 0; i < matrix->rows; ++i) {
+        matrix->self[i] = malloc(matrix->columns * sizeof(Rational));
+        for (int j = 0; j < matrix->columns; ++j) {
+            set_rat_f(&matrix->self[i][j], 0.0);
         }
     }
     return matrix;
-
 }
 
-Matrix* multiply_mat(Matrix* mat1, Matrix* mat2){
+Matrix* mat_copy(Matrix* mat){
+    //duplicates given matrix and returns pointer to copy
+    Matrix* mat2 = malloc(sizeof(Matrix)); //allocate on heap
+    mat_alloc(mat->rows, mat->columns);
+
+    mat2->columns = mat->columns;
+    mat2->rows = mat->rows;
+    for (int i = 0; i < mat->rows; ++i) {
+        for (int j = 0; j < mat->columns; ++j) {
+            mat2->self[i][j] = mat->self[i][j];
+        }
+    }
+
+    return mat2;
+}
+
+Matrix* mat_sum(Matrix* mat1, Matrix* mat2){
+    if(mat1->rows != mat2->rows || mat1->rows != mat2->rows)
+        return NULL;
+
+    for (int i = 0; i < mat1->rows; ++i) {
+        for (int j = 0; j < mat1->columns; ++j) {
+            rat_sum(&mat1->self[i][j], &mat2->self[i][j]);
+        }
+    }
+
+    return mat1;
+}
+
+Matrix* mat_dif(Matrix* mat1, Matrix* mat2){
+    if(mat1->rows != mat2->rows || mat1->rows != mat2->rows)
+        return NULL;
+
+    for (int i = 0; i < mat1->rows; ++i) {
+        for (int j = 0; j < mat1->columns; ++j) {
+            rat_dif(&mat1->self[i][j], &mat2->self[i][j]);
+        }
+    }
+
+    return mat1;
+}
+
+Matrix* mat_prod(Matrix* mat1, Matrix* mat2){
     if(mat1->columns != mat2->rows)
         return NULL;
-    Matrix* result = alloc_mat(mat1->rows, mat2->columns);
+
+    Rational temp;
+    Matrix* result = mat_alloc(mat1->rows, mat2->columns);
     for (int i = 0; i < result->rows; ++i) {
         for (int j = 0; j < result->columns; ++j) { //iterate over rows and columns
-            for (int k = 0; k < mat1->columns; ++k) {
-                //result->self[i][j] += mat1->self[i][k] * mat2->self[k][j];
+            for (int k = 0; k < mat1->rows; ++k) {
+                temp = rat_r_prod_c(mat1->self[i][k], mat2->self[k][j]);
+                rat_sum(&result->self[i][j], &temp);
             }
         }
     }
+    mat_free(mat1);
+    mat_free(mat2);
+    return result;
+}
+
+Matrix* input_mat(){
+    //allocates mem and polls user to fill matrix
+
+    char input[10];
+
+    printf("Enter the number of rows and columns in the format 'RRxCC'.\n");
+    scanf("%s", input);
+
+    for (int i = 0; i < 10; ++i) {
+        if(!(input[i] == 'x' || input[i] == 'X' || input[i] == '\n' || input[i] == '\0' || (input[i] >= '0' && input[i] <= '9'))){
+            printf("That was not a valid input, please try again.\n");
+            return input_mat();
+        }
+        if(input[i] == '\n' || input[i] == '\0'){
+            input[i] = '\0';
+            break;
+        }
+    }
+
+    int rows = atoi(strtok(input, "xX"));
+    int columns = atoi(strtok(NULL, "xX"));
+
+    if(columns > MAXCOLS || rows > MAXROWS){
+        printf("Matrix too large, please enter a smaller size\n");
+        return input_mat();
+    }
+
+    Matrix* mat = mat_alloc(rows, columns);
+
+    if(!mat){
+        fprintf(stderr, "Memory fault\n");
+        exit(1);
+    }
+
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < columns; ++j) {
+            printf("Row %d, column %d\n", i, j);
+            input_rational(&(mat->self[i][j]));
+        }
+    }
+
+    print_mat(mat);
+    return mat;
+}
+
+void print_mat(Matrix* mat){
+    for (int i = 0; i < mat->rows; ++i) {
+        printf("[ ");
+        for (int j = 0; j < mat->columns; ++j) {
+            printf("  %d/%d  ", mat->self[i][j].numerator, mat->self[i][j].denominator);
+        }
+        printf(" ]\n\n");
+    }
+    printf("\n");
 }
 
 unsigned int gcf(int num1, int num2){
