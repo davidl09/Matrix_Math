@@ -1,3 +1,0 @@
-"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E rm -f CMakeFiles\Matrix_Math.dir/objects.a
-C:\MinGW\bin\ar.exe qc CMakeFiles\Matrix_Math.dir/objects.a @CMakeFiles\Matrix_Math.dir\objects1
-C:\MinGW\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\Matrix_Math.dir/objects.a -Wl,--no-whole-archive -o Matrix_Math.exe -Wl,--out-implib,libMatrix_Math.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Matrix_Math.dir\linkLibs.rsp
