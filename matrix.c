@@ -63,8 +63,8 @@ Rational* input_rational(Rational* num){
     num->numerator = (int)round(numer * pow(10, dec_pts));
     num->denominator = (int)round(denom * pow(10, dec_pts));
 
-    rnorm(num);
-
+    if(num->numerator != 0) rnorm(num);
+    
     free(input[0]);
     return num;
 }
@@ -82,6 +82,10 @@ Rational* rnorm(Rational* rational){
     if(rational->denominator < 0){ //make denominator always positive
         rational->denominator *= -1;
         rational->numerator *= -1;
+    }
+    if(rational->numerator == 0){
+        rational->dec_est = 0.0;
+        return rational;
     }
 
     unsigned int gfact = gcf(rational->numerator, rational->denominator);
@@ -307,6 +311,7 @@ Matrix* input_mat(){
     //allocates mem and polls user to fill matrix
 
     char input[10];
+    int x = 0;
 
     printf("Enter the number of rows and columns in the format 'RRxCC'.\n");
     scanf("%s", input);
@@ -316,8 +321,13 @@ Matrix* input_mat(){
             printf("That was not a valid input, please try again.\n");
             return input_mat();
         }
+        if(input[i] == 'x' || input[i] == 'X') x = 1;
         if(input[i] == '\n' || input[i] == '\0'){
             input[i] = '\0';
+            if(x == 0){
+                printf("That was not a valid input, please try again.\n");
+                return input_mat();
+            }
             break;
         }
     }

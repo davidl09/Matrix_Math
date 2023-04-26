@@ -1,7 +1,7 @@
 #include "matrix.h"
 
 int main(void){
-    
+    /*
     double num;
     Rational rational, rational1;
     int i = 0;
@@ -14,8 +14,8 @@ int main(void){
         printf("The answer is %lld/%lld, approx. %lf\n", rational.numerator, rational.denominator, rational.dec_est);
         i++;
     }
-    /*
-
+    
+*/
     Matrix *matrix1, *matrix2;
     matrix1 = input_mat();
     matrix2 = input_mat();
@@ -23,6 +23,7 @@ int main(void){
     if(result)
         print_mat(result);
     else exit(1);
+    mat_free(result);
     return 0;
-    */
+    
 }
