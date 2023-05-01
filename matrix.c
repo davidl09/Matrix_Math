@@ -15,7 +15,6 @@ unsigned int is_prime(int num){
 }
 
 
-
 Rational* input_rational(Rational* num){
     double numer, denom;
     char* input[3];
@@ -197,6 +196,21 @@ Rational* rat_r_quot(Rational* num1, Rational* num2){
     return num1;
 }
 
+void print_rat(Rational* rational){
+    if(rational->numerator == 0){
+        printf("      0      ");
+        return;
+    }
+    switch(rational->denominator){
+        case 1:
+            printf("%6lld  ", rational->numerator);
+            return;
+        default:
+            printf("%6lld/%lld  ", rational->numerator, rational->denominator);
+            return;
+    }
+}
+
 void mat_free(Matrix* mat){
     //deallocate all memory allocated to a matrix
     for (int i = 0; i < mat->columns; ++i) {
@@ -204,6 +218,36 @@ void mat_free(Matrix* mat){
     }
     free(mat->self);
     free(mat);
+}
+
+int is_ref(Matrix* mat){
+    for (int i = 0; i < mat->rows; ++i) {
+        for (int j = 0; j < i; ++j) {
+            if(mat->self[i][j].numerator != 0){ //if pivot column found
+                for (int k = i + 1; k < mat->rows; ++k) {
+                    if(mat->self[k][j].numerator != 0)
+                        return 0;
+                }
+                break;
+            }
+        }
+    }
+    return 1;
+}
+
+int is_rref(Matrix* mat){
+    for (int i = 0; i < mat->rows; ++i) {
+        for (int j = 0; j < mat->columns; ++j) {
+            if(mat->self[i][j].numerator != 0){ //if pivot column found
+                for (int k = 0; k < mat->rows; ++k) {
+                    if(k != i && mat->self[k][j].numerator !=  0)
+                        return 0;
+                }
+                break;
+            }
+        }
+    }
+    return 1;
 }
 
 Matrix* mat_alloc(int rows, int columns){
@@ -362,11 +406,15 @@ void print_mat(Matrix* mat){
     for (int i = 0; i < mat->rows; ++i) {
         printf("[");
         for (int j = 0; j < mat->columns; ++j) {
-            printf(" %3.lld/%lld ", mat->self[i][j].numerator, mat->self[i][j].denominator);
+            print_rat(&mat->self[i][j]);//printf(" %3.lld/%lld ", mat->self[i][j].numerator, mat->self[i][j].denominator);
         }
         printf(" ]\n\n");
     }
     printf("\n");
+}
+
+unsigned int lcm(int num1, int num2){
+    return (num1 * num2)/gcf(num1, num2);
 }
 
 unsigned int gcf(int num1, int num2){

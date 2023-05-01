@@ -18,6 +18,9 @@ int main(void){
 */
     Matrix *matrix1, *matrix2;
     matrix1 = input_mat();
+    if(is_ref(matrix1))
+        printf("Matrix is in REF");
+    else printf("Matrix is not in REF");
     matrix2 = input_mat();
     Matrix* result = mat_prod(matrix1, matrix2);
     if(result)
@@ -25,5 +28,4 @@ int main(void){
     else exit(1);
     mat_free(result);
     return 0;
-    
 }

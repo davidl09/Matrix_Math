@@ -41,15 +41,19 @@ Rational* rat_r_quot(Rational* num1, Rational* num2);
 Rational* rat_inv_s(Rational* num1);
 Rational* input_rational(Rational* num);
 Rational* rnorm(Rational* rational);
+void print_rat(Rational* rational);
 
 unsigned int is_prime(int num);
 unsigned int gcf(int num1, int num2);
+unsigned int lcm(int num1, int num2);
 unsigned int prime_fact(int num);
 unsigned int* list_prime_fact(int num);
 unsigned int round_e2(double num);
 
 void mat_free(Matrix* mat);
 void print_mat(Matrix* mat);
+int is_ref(Matrix* mat);
+int is_rref(Matrix* mat);
 Matrix* input_mat();
 Matrix* mat_alloc(int rows, int columns);
 Matrix* mat_alloc_r(Matrix* matrix);
